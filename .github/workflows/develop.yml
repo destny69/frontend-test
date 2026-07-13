@@ -1,0 +1,42 @@
+name: Deploy to Develop Server
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+
+  call-ansible:
+    needs: build
+    uses: MantraIdeas/ansible-appdeployment/.github/workflows/frontend-deploy.yml@master
+    with:
+      repo_url: ${{ vars.DEVELOP_REPO_URL }}
+      branch_name: develop
+      app_path: ${{ vars.DEVELOP_APP_PATH }}
+    secrets:
+      server_fe_ip: ${{ secrets.DEVELOP_SERVER_IP }}
+      ssh_user: ${{ secrets.DEVELOP_SSH_USER }}
+      ssh_port: ${{ secrets.DEVELOP_SSH_PORT }}
