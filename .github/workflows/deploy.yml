@@ -12,7 +12,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: server
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to Production
         uses: destny69/package-modules/actions/deploy-artifact@v0.0.4
