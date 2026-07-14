@@ -27,16 +27,21 @@ jobs:
           build-command: npm run build
 
       - name: Package and publish
+        id: upload
         uses: destny69/package-modules/actions/zip-and-upload@v0.0.2
         with:
           build-folder: dist
-          package-name: react-application
+          package-name: frontend
           github-token: ${{ secrets.TOKEN }}
 
-      # REPLACED: Instead of deploying, upload the file to view/download it
-      - name: Upload Zip for inspection
+
+      - name: Save URL to file
+        run: echo "${{ steps.upload.outputs.package-url }}" > package_url.txt
+
+
+      - name: Upload URL Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: packaged-react-application # The name you'll see in the GitHub UI
-          path: react-application.zip       # The path to the zip file created by the previous step
-          if-no-files-found: error          # Fails the build if the file name/path is incorrect
+          name: package-url-artifact
+          path: package_url.txt
+
