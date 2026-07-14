@@ -14,13 +14,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Pre-build validation
-        uses: destny69/package-modules/actions/pipeline-prechecks@v0.0.2
+        uses: destny69/package-modules/actions/pipeline-prechecks@v0.0.4
         with:
           fail-on-audit-warnings: true
           working-directory: .
 
       - name: Build application
-        uses: destny69/package-modules/actions/build-project@v0.0.2
+        uses: destny69/package-modules/actions/build-project@v0.0.4
         with:
           working-directory: .
           build-folder: dist
@@ -28,20 +28,10 @@ jobs:
 
       - name: Package and publish
         id: upload
-        uses: destny69/package-modules/actions/zip-and-upload@v0.0.2
+        uses: destny69/package-modules/actions/zip-and-upload@v0.0.4
         with:
           build-folder: dist
           package-name: frontend
           github-token: ${{ secrets.TOKEN }}
 
-
-      - name: Save URL to file
-        run: echo "${{ steps.upload.outputs.package-url }}" > package_url.txt
-
-
-      - name: Upload URL Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-url-artifact
-          path: package_url.txt
 

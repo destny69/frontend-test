@@ -3,24 +3,24 @@ name: Manual Production Deployment
 # This creates the manual "Run workflow" button in GitHub Actions
 on:
   workflow_dispatch:
+    inputs:
+      version-tag:
+        description: 'The package version tag to deploy (e.g., main-f1a2b3c4 or v1.0.0)'
+        required: true
+        type: string
+        default: 'main'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      # 1. Download the text file artifact containing the URL from the active run
-      - name: Download URL Artifact
-        uses: actions/download-artifact@v4
+      - name: Deploy to Production
+        uses: destny69/package-modules/actions/deploy-artifact@v0.0.4
         with:
-          name: package-url-artifact
-
-      # 2. Read the text file back into an environment variable and use it
-      - name: Read URL and Execute Deploy
-        run: |
-          PACKAGE_URL=$(cat package_url.txt)
-          echo "Deploying artifact from URL: $PACKAGE_URL"
-          
-          # Add your custom curl or deployment commands here using $PACKAGE_URL
+          package-name: 'frontend'
+          version-tag: ${{ inputs.version-tag }} # Dynamically uses the UI input
+          deploy-target-path: '/var/www/html/test'
+          github-token: ${{ secrets.TOKEN }}
+          server-ip: 188.245.106.180
+          server-ssh-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+          server-user: 'root'
